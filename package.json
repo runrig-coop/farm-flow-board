@@ -16,7 +16,7 @@
   "dependencies": {
     "@internationalized/date": "^3.5.4",
     "@vueuse/core": "^10.9.0",
-    "radix-vue": "^1.8.1",
+    "radix-vue": "^1.8.5",
     "ramda": "^0.30.0",
     "uuid": "^10.0.0",
     "vue": "^3.4.21",
