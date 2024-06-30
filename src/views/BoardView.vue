@@ -104,8 +104,8 @@ function loadEntities(): void {
     plants.value = random[1];
   }
   else if (info.id in sessionStorage && typeof sessionStorage[info.id] === 'string') {
-    const json = JSON.parse(sessionStorage[info.id]);
-    const data = deserialize(json);
+    const data = deserialize(sessionStorage[info.id]);
+    // const data = deserialize(json);
     crops.value = data.crops;
     locations.value = data.locations;
     operations.value = data.operations;
@@ -115,7 +115,7 @@ function loadEntities(): void {
 }
 
 function importBoard(data: BoardData) {
-  const json = JSON.stringify(serialize(data));
+  const json = serialize(data);
   sessionStorage.setItem(data.board.id, json);
   boardIndex.value = boards.value.push(data.board) - 1;
 }
@@ -129,7 +129,7 @@ function exportBoard() {
     tasks: tasks.value,
     plants: plants.value,
   };
-  const json = JSON.stringify(serialize(data), null, 2);
+  const json = serialize(data, null, 2);
   const blob = new Blob([json], { type: 'text/json' });
   const link = document.createElement('a');
 

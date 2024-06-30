@@ -25,7 +25,7 @@ const { open: openSystemFileDialog, onChange } = useFileDialog({
 });
 onChange((files) => {
   files?.[0].text().then((json) => {
-    const data = deserialize(JSON.parse(json));
+    const data = deserialize(json);
     dataImport.value = data;
     name.value = data.board.name;
     dateRange.value = data.board.dateRange;
