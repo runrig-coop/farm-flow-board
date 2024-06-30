@@ -47,16 +47,6 @@ function cancelChanges() {
   emit('update:cancel');
   emit('close');
 }
-
-/**
- * As of radix-vue@1.8.4, using 'enter' forces the user to hold the SHIFT key in
- * order to input a SPACE, which otherwise calls .submit(). This was fixed and
- * merged into main as of Jun 19, 2024, but as of writing this, it hasn't yet
- * been released to the npm registry (presumably as 1.8.5). So for now, using
- * 'blur' for the submit-mode is prop is necessary. No need for reactivity.
- * @see https://github.com/radix-vue/radix-vue/pull/1013
- */
-const submitMode = 'blur';
 </script>
 
 <template>
@@ -88,7 +78,7 @@ const submitMode = 'blur';
             v-model="name"
             v-slot="{ isEditing }"
             placeholder="Untitled Board"
-            :submit-mode="submitMode"
+            submit-mode="enter"
             auto-resize
             class="editable-root" >
             <Editable.Area class="editable-area">
