@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onClickOutside, useFileDialog } from '@vueuse/core';
-import { Dialog, Editable, Label } from 'radix-vue/namespaced';
+import { useFileDialog } from '@vueuse/core';
+import { Dialog, Label } from 'radix-vue/namespaced';
 import { deserialize } from '@/data/deserialize';
 import type { BoardData } from '@/data/deserialize';
 import { defaultSeason, fallbackRange } from '@/utils/date';
 import FFDatePicker from '@/components/FFDatePicker.vue';
-import IconPencil2 from '@/assets/radix-icons/pencil-2.svg?component';
 
 defineProps<{ open: boolean }>();
 const emit = defineEmits<{
@@ -30,13 +29,6 @@ onChange((files) => {
     name.value = data.board.name;
     dateRange.value = data.board.dateRange;
   });
-});
-
-const editableRoot = ref(null);
-onClickOutside(editableRoot, () => {
-  const selector = 'button.editable-trigger-submit';
-  const btn = document.querySelector<HTMLButtonElement>(selector);
-  if (btn) btn.click();
 });
 
 function confirmChanges() {
@@ -70,37 +62,12 @@ function cancelChanges() {
         </Dialog.Description>
 
         <div v-if="dataImport">
-          <Label class="editable-label" for="edit-board-name">Board Name:</Label>
-
-          <Editable.Root
+          <Label for="edit-board-name">Board Name:</Label>
+          <input
             id="edit-board-name"
-            ref="editableRoot"
+            type="text"
             v-model="name"
-            v-slot="{ isEditing }"
-            placeholder="Untitled Board"
-            submit-mode="enter"
-            auto-resize
-            class="editable-root" >
-            <Editable.Area class="editable-area">
-              <Editable.Preview class="editable-preview" />
-              <Editable.Input class="editable-input" />
-            </Editable.Area>
-            <div class="editable-trigger-wrapper" >
-              <Editable.EditTrigger v-if="!isEditing" class="editable-trigger-edit" >
-                <span>
-                  <IconPencil2 />
-                </span>
-              </Editable.EditTrigger>
-              <span v-else >
-                <Editable.SubmitTrigger class="editable-trigger-submit">
-                  Done
-                </Editable.SubmitTrigger>
-                <Editable.CancelTrigger class="editable-trigger-cancel" >
-                  Reset
-                </Editable.CancelTrigger>
-              </span>
-            </div>
-          </Editable.Root>
+            class="edit-dialog-input-name" />
 
           <FFDatePicker
             @change="dateRange[0] = $event"
@@ -125,8 +92,8 @@ function cancelChanges() {
               type="button"
               @click="openSystemFileDialog()"
               aria-label="Replace"
-              class="edit-dialog-btn btn-replace">
-              Replace
+              class="edit-dialog-btn btn-open">
+              Open
             </button>
 
             <button
@@ -220,10 +187,7 @@ button, input {
   justify-content: flex-end;
   margin-top: 1.5rem;
 }
-.edit-dialog-btns button.edit-dialog-btn,
-.editable-trigger-submit,
-.editable-trigger-cancel,
-.editable-trigger-edit {
+.edit-dialog-btns button.edit-dialog-btn {
   font-size: 16px;
   font-weight: 500;
   line-height: 1.5;
@@ -239,16 +203,12 @@ button, input {
 }
 .edit-dialog-btns button.edit-dialog-btn.btn-save,
 .edit-dialog-btns button.edit-dialog-btn.btn-open,
-.edit-dialog-btns button.edit-dialog-btn.btn-cancel:hover,
-.edit-dialog-btns button.edit-dialog-btn.btn-replace:hover,
-.editable-trigger-submit,
-.editable-trigger-cancel:hover {
+.edit-dialog-btns button.edit-dialog-btn.btn-cancel:hover {
   color: var(--ff-c-green);
   background-color: var(--color-background);
 }
 .edit-dialog-btns button.edit-dialog-btn.btn-save:hover,
-.edit-dialog-btns button.edit-dialog-btn.btn-open:hover,
-.editable-trigger-submit:hover {
+.edit-dialog-btns button.edit-dialog-btn.btn-open:hover {
   background-color: var(--ff-c-green-transparent-3);
 }
 .edit-dialog-btns button.edit-dialog-btn.btn-delete {
@@ -259,6 +219,21 @@ button, input {
   box-shadow: 0 0 2px 1px var(--vt-c-red);
   background-color: var(--color-background);
 }
+
+
+
+.edit-dialog-input-name {
+  background-color: var(--color-background);
+  width: 100%;
+  font-size: 30px;
+  padding: .125rem .375rem;
+  border-radius: 0.25rem;
+  border-width: 1px;
+  border: 1px solid var(--color-border);
+  cursor: text;
+}
+
+
 
 @keyframes overlayShow {
   from {
@@ -278,50 +253,6 @@ button, input {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
-}
-
-
-.editable-root {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  margin-bottom: 1.125rem;
-}
-
-.editable-area {
-  color: var(--color-heading);
-  font-size: 30px;
-  width: 240px;
-  flex: auto;
-}
-.editable-preview {
-  cursor: pointer;
-}
-.editable-input {
-  cursor: text;
-}
-
-.editable-trigger-wrapper {
-  display: flex;
-  align-items: baseline;
-  gap: 1rem;
-}
-
-.editable-trigger-submit,
-.editable-trigger-cancel,
-.editable-trigger-edit {
-  align-items: flex-end;
-  margin: .375rem 0 0 .375rem;
-  padding: .375rem .75rem;
-}
-.editable-trigger-edit {
-  cursor: pointer;
-  border: none;
-}
-.editable-trigger-edit svg {
-  width: 24px;
-  height: 24px;
-  color: var(--color-text);
 }
 
 .edit-dialog-date-picker {
