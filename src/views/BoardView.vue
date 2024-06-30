@@ -2,7 +2,7 @@
 import { computed, provide, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useDark, useToggle } from '@vueuse/core'
-import { Switch } from 'radix-vue/namespaced';
+import { Editable, Switch } from 'radix-vue/namespaced';
 import { mergeRight, omit, pick } from 'ramda';
 import {
   boardIndexKey, boardsKey, cropsKey, dateRangeKey, dateSequenceKey, isDarkKey,
@@ -25,8 +25,9 @@ import FlowBoardOperations from '@/components/FlowBoardOperations.vue';
 import FlowBoardMenubar from '@/components/FlowBoardMenubar.vue';
 import { createDateSequence } from '@/utils/date';
 import LogoType from '@/assets/logotype_color.svg?component';
-import IconSun from '@/assets/radix-icons/sun.svg?component'
-import IconMoon from '@/assets/radix-icons/moon.svg?component'
+import IconMoon from '@/assets/radix-icons/moon.svg?component';
+import IconPencil2 from '@/assets/radix-icons/pencil-2.svg?component';
+import IconSun from '@/assets/radix-icons/sun.svg?component';
 
 const boards = ref<BoardInfo[]>([
   boardInfo2023,
@@ -34,6 +35,18 @@ const boards = ref<BoardInfo[]>([
 ]);
 const boardIndex = ref<number>(0);
 const boardInfo = computed(() => boards.value[boardIndex.value]);
+
+const editableName = ref<string>(boardInfo.value?.name || '');
+watch([() => boardInfo.value.name, boardIndex], ([name]) => {
+  if (name !== editableName.value) {
+    editableName.value = boardInfo.value.name;
+  }
+});
+function submitBoardName(name: string|undefined) {
+  if (typeof name === 'string' && name !== '') {
+    boards.value[boardIndex.value].name = name;
+  }
+}
 
 // All of the core data entities.
 const tasks = ref<LogResource[]>(tasks2023);
@@ -175,10 +188,46 @@ provide(isDarkKey, isDark);
 <template>
   <div class="layout">
     <header>
+
       <div class="logotype">
         <LogoType/>
       </div>
-      <h1>{{ boardInfo.name }}</h1>
+
+      <Editable.Root
+        id="edit-board-name"
+        v-model:model-value="editableName"
+        @update:model-value="editableName = $event"
+        @submit="submitBoardName"
+        v-slot="{ isEditing }"
+        placeholder="Untitled Board"
+        auto-resize
+        class="editable-root" >
+        <Editable.Area class="editable-area">
+
+          <Editable.Preview class="editable-preview" />
+          <Editable.Input class="editable-input" />
+
+        </Editable.Area>
+        <div class="editable-trigger-wrapper" >
+
+          <Editable.EditTrigger v-if="!isEditing" class="editable-trigger-edit" >
+            <span>
+              <IconPencil2 />
+            </span>
+          </Editable.EditTrigger>
+
+          <span v-else >
+            <Editable.SubmitTrigger class="editable-trigger-submit">
+              Done
+            </Editable.SubmitTrigger>
+            <Editable.CancelTrigger class="editable-trigger-cancel" >
+              Reset
+            </Editable.CancelTrigger>
+          </span>
+
+        </div>
+      </Editable.Root>
+
       <div class="menubar">
         <FlowBoardMenubar
           @select-board="boardIndex = $event"
@@ -187,6 +236,7 @@ provide(isDarkKey, isDark);
           @create-task="onBoardUpdate"
           @update-board-info="onBoardUpdate" />
       </div>
+
       <div class="dark-mode-toggle">
         <Switch.Root
           :checked="isDark"
@@ -198,10 +248,13 @@ provide(isDarkKey, isDark);
           </Switch.Thumb>
         </Switch.Root>
       </div>
+
     </header>
+
     <main>
       <FlowBoard @update="onBoardUpdate" @delete="onDelete"/>
     </main>
+
     <footer>
       <FlowBoardOperations/>
     </footer>
@@ -217,15 +270,22 @@ provide(isDarkKey, isDark);
 }
 
 header {
-  display: flex;
+  display: grid;
+  grid-template-columns: calc(240px + 3rem) auto auto;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "logo name name"
+    "logo menu dark";
   align-items: center;
+  row-gap: .125rem;
+  padding: .125rem 0;
   justify-content: flex-start;
   line-height: 1.5;
   height: 5.5rem;
 }
 
 .logotype {
-  flex: 0 0 calc(240px + 3rem);
+  grid-area: logo;
   padding-top: .375rem;
   text-align: center;
 }
@@ -238,7 +298,75 @@ h1 {
   margin-right: 1.5rem;
 }
 
+.editable-root {
+  grid-area: name;
+  display: flex;
+  flex-direction: row;
+}
+
+.editable-area {
+  color: var(--color-text);
+  font-size: 30px;
+  width: 180px;
+  flex: auto;
+}
+.editable-preview {
+  cursor: pointer;
+}
+.editable-input {
+  cursor: text;
+}
+
+.editable-trigger-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.editable-trigger-submit,
+.editable-trigger-cancel,
+.editable-trigger-edit {
+  align-items: flex-end;
+  margin: .375rem 0 0 .375rem;
+  padding: .125rem .75rem;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-wrap: nowrap;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editable-trigger-submit,
+.editable-trigger-cancel:hover {
+  color: var(--ff-c-green);
+  background-color: var(--color-background);
+}
+
+.editable-trigger-submit:hover {
+  background-color: var(--ff-c-green-transparent-3);
+}
+
+.editable-trigger-edit {
+  cursor: pointer;
+  border: none;
+}
+.editable-trigger-edit svg {
+  width: 24px;
+  height: 24px;
+  color: var(--color-text);
+}
+
+.menubar {
+  grid-area: menu;
+  margin-right: 1.5rem;
+}
+
 .dark-mode-toggle {
+  grid-area: dark;
   margin-left: auto;
   margin-right: 4rem;
   vertical-align: middle;

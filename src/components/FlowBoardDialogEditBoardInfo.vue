@@ -89,7 +89,7 @@ function cancelChanges() {
             <Editable.Input class="editable-input" />
           </Editable.Area>
           <div class="editable-trigger-wrapper" >
-            <Editable.EditTrigger v-if="!isEditing" class="editable-trigger-edi" >
+            <Editable.EditTrigger v-if="!isEditing" class="editable-trigger-edit" >
               <span>
                 <IconPencil2 />
               </span>
@@ -199,7 +199,7 @@ button, input {
 .edit-dialog-btns button.edit-dialog-btn,
 .editable-trigger-submit,
 .editable-trigger-cancel,
-.editable-trigger-edi {
+.editable-trigger-edit {
   font-size: 16px;
   font-weight: 500;
   line-height: 1.5;
@@ -282,16 +282,16 @@ button, input {
 
 .editable-trigger-submit,
 .editable-trigger-cancel,
-.editable-trigger-edi {
+.editable-trigger-edit {
   align-items: flex-end;
   margin: .375rem 0 0 .375rem;
   padding: .375rem .75rem;
 }
-.editable-trigger-edi {
+.editable-trigger-edit {
   cursor: pointer;
   border: none;
 }
-.editable-trigger-edi svg {
+.editable-trigger-edit svg {
   width: 24px;
   height: 24px;
   color: var(--color-text);

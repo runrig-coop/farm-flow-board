@@ -291,13 +291,13 @@ button {
 .MenubarRoot {
   display: flex;
   background-color: var(--color-background-soft);
-  padding: 3px;
-  border-radius: 6px;
-  box-shadow: 0 0px 6px -3px var(--color-box-shadow-2);
+  padding: .125rem;
+  border-radius: .375rem;
+  box-shadow: 0 0px .375rem -.375rem var(--color-box-shadow-2);
 }
 
 :deep(.MenubarTrigger) {
-  padding: 8px 12px;
+  padding: .125rem .75rem;
   outline: none;
   user-select: none;
   font-weight: 500;
@@ -309,6 +309,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 2px;
+  cursor: pointer;
 }
 
 :deep(.MenubarTrigger)[data-highlighted],
